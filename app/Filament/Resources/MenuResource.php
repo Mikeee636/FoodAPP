@@ -1,5 +1,4 @@
 <?php
-// In app/Filament/Resources/MenuResource.php
 
 namespace App\Filament\Resources;
 
@@ -10,12 +9,15 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+// Import class yang dibutuhkan
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\IconColumn;
 
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack'; // Ganti ikon jika mau
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -24,7 +26,8 @@ class MenuResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Menu')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('type')
                     ->label('Jenis Menu')
                     ->options([
@@ -37,6 +40,20 @@ class MenuResource extends Resource
                     ->required()
                     ->numeric()
                     ->prefix('Rp'),
+
+                // --- FITUR BARU DITAMBAHKAN DI SINI ---
+                Toggle::make('is_available')
+                    ->label('Tersedia untuk Dijual')
+                    ->default(true)
+                    ->helperText('Jika nonaktif, menu tidak akan muncul di halaman pelanggan.'),
+                Forms\Components\TextInput::make('stock')
+                    ->label('Jumlah Stok')
+                    ->numeric()
+                    ->required()
+
+                    ->helperText('Stok akan berkurang otomatis setiap ada pesanan.'),
+                // --- AKHIR FITUR BARU ---
+
                 Forms\Components\Textarea::make('description')
                     ->label('Deskripsi')
                     ->columnSpanFull(),
@@ -56,27 +73,33 @@ class MenuResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Jenis')
+                    ->badge(),
+
+                // --- TAMPILAN BARU DI TABEL ---
+                Tables\Columns\TextColumn::make('stock')
+                    ->label('Stok')
+                    ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'makanan' => 'success',
-                        'minuman' => 'info',
+                    ->color(fn (int $state): string => match (true) {
+                        $state === 0 => 'danger',
+                        $state < 10 => 'warning',
+                        default => 'success',
                     }),
+                IconColumn::make('is_available')
+                    ->label('Tersedia')
+                    ->boolean(),
+                // --- AKHIR TAMPILAN BARU ---
+
                 Tables\Columns\TextColumn::make('price')
                     ->label('Harga')
                     ->money('IDR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat Pada')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                // Filter bisa ditambahkan di sini
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -85,7 +108,6 @@ class MenuResource extends Resource
             ]);
     }
 
-    // ... (fungsi lainnya biarkan default)
     public static function getRelations(): array
     {
         return [
