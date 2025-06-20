@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('customer_name');
-            $table->decimal('total_price', 15, 2);
-            $table->string('status')->default('baru'); // Status: baru, diproses, selesai, dibatalkan
-            $table->timestamps();
-        });
+        $table->id();
+        $table->string('customer_name');
+        $table->string('phone_number')->nullable();
+        $table->text('address')->nullable();
+        $table->decimal('total_price', 15, 2);
+        $table->string('status')->default('baru');
+        $table->string('payment_method')->nullable();
+        $table->timestamps();
+    });
     }
 
     /**

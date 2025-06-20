@@ -12,6 +12,9 @@ use Filament\Tables\Table;
 // Import class yang dibutuhkan
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Forms\Components\FileUpload;
+use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
+
 
 class MenuResource extends Resource
 {
@@ -57,10 +60,13 @@ class MenuResource extends Resource
                 Forms\Components\Textarea::make('description')
                     ->label('Deskripsi')
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('image_url')
-                    ->label('URL Gambar')
-                    ->maxLength(255)
-                    ->columnSpanFull(),
+               FileUpload::make('image_url') // Nama kolom database Anda
+                    ->label('Gambar Menu')
+                    ->directory('menu-images') // Direktori di storage/app/public untuk menyimpan gambar
+                    ->image() // Hanya izinkan upload gambar
+
+                    ->columnSpanFull()
+                    ->nullable(),
             ]);
     }
 

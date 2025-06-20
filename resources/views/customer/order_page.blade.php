@@ -47,29 +47,55 @@
         </div>
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <!-- Kolom Menu Makanan -->
-            <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm">
-                <h2 class="text-2xl font-bold mb-6">Daftar Menu</h2>
-                <div class="space-y-5">
-                    @forelse($menus as $menu)
-                        <article class="flex items-center">
-                            <img src="{{ $menu->image_url ?? 'https://placehold.co/100x100/e2e8f0/64748b?text=Menu' }}" alt="{{ $menu->name }}" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
-                            <div class="ml-4 flex-grow">
-                                <h3 class="font-semibold text-lg text-gray-800">{{ $menu->name }}</h3>
-                                <p class="text-gray-800 font-bold mt-1">Rp{{ number_format($menu->price, 0, ',', '.') }}</p>
-                                <p class="text-sm text-gray-500 mt-2">Stok Tersisa: <span class="font-medium text-blue-600">{{ $menu->stock }}</span></p>
-                            </div>
-                            <div id="menu-controls-{{ $menu->id }}" class="ml-4 flex-shrink-0" data-stock="{{ $menu->stock }}" data-name="{{ $menu->name }}" data-price="{{ $menu->price }}">
-                                <!-- Tombol akan di-render oleh JavaScript -->
-                            </div>
-                        </article>
-                    @empty
-                        <p class="text-center text-gray-500 py-10">Saat ini belum ada menu yang tersedia.</p>
-                    @endforelse
-                </div>
-            </section>
+            {{-- Container untuk Daftar Makanan dan Daftar Minuman (Kolom Kiri) --}}
+            <div class="lg:col-span-2 grid grid-cols-1 gap-6">
 
-            <!-- Kolom Keranjang & Form -->
+                <section class="bg-white p-6 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-6">Daftar Menu Makanan</h2>
+                    <div class="space-y-5">
+                        {{-- Pastikan variabel $makanan dilewatkan dari controller --}}
+                        @forelse($makanan as $menu)
+                            <article class="flex items-center">
+                               <img src="{{ asset('storage/' . $menu->image_path) }}" alt="{{ $menu->name }}" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
+                                <div class="ml-4 flex-grow">
+                                    <h3 class="font-semibold text-lg text-gray-800">{{ $menu->name }}</h3>
+                                    <p class="text-gray-800 font-bold mt-1">Rp{{ number_format($menu->price, 0, ',', '.') }}</p>
+                                    <p class="text-sm text-gray-500 mt-2">Stok Tersisa: <span class="font-medium text-blue-600">{{ $menu->stock }}</span></p>
+                                </div>
+                                {{-- Pastikan data-id menggunakan ID menu yang unik --}}
+                                <div id="menu-controls-{{ $menu->id }}" class="ml-4 flex-shrink-0" data-stock="{{ $menu->stock }}" data-name="{{ $menu->name }}" data-price="{{ $menu->price }}">
+                                    </div>
+                            </article>
+                        @empty
+                            <p class="text-center text-gray-500 py-10">Saat ini belum ada menu makanan yang tersedia.</p>
+                        @endforelse
+                    </div>
+                </section>
+
+                <section class="bg-white p-6 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-6">Daftar Menu Minuman</h2>
+                    <div class="space-y-5">
+                        {{-- Pastikan variabel $minuman dilewatkan dari controller --}}
+                        @forelse($minuman as $menu)
+                            <article class="flex items-center">
+                               <img src="{{ asset('storage/' . $menu->image_path) }}" alt="{{ $menu->name }}" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
+                                <div class="ml-4 flex-grow">
+                                    <h3 class="font-semibold text-lg text-gray-800">{{ $menu->name }}</h3>
+                                    <p class="text-gray-800 font-bold mt-1">Rp{{ number_format($menu->price, 0, ',', '.') }}</p>
+                                    <p class="text-sm text-gray-500 mt-2">Stok Tersisa: <span class="font-medium text-blue-600">{{ $menu->stock }}</span></p>
+                                </div>
+                                {{-- Pastikan data-id menggunakan ID menu yang unik --}}
+                                <div id="menu-controls-{{ $menu->id }}" class="ml-4 flex-shrink-0" data-stock="{{ $menu->stock }}" data-name="{{ $menu->name }}" data-price="{{ $menu->price }}">
+                                    </div>
+                            </article>
+                        @empty
+                            <p class="text-center text-gray-500 py-10">Saat ini belum ada menu minuman yang tersedia.</p>
+                        @endforelse
+                    </div>
+                </section>
+
+            </div> {{-- Penutup container untuk Daftar Makanan dan Minuman --}}
+
             <aside class="lg:col-span-1">
                 <div class="bg-white p-6 rounded-xl shadow-sm sticky top-8">
                     <h2 class="text-2xl font-bold mb-4">Detail Pesanan</h2>
@@ -96,6 +122,23 @@
                         <div>
                             <label for="address" class="block text-sm font-medium text-gray-700">Alamat Pengiriman</label>
                             <textarea id="address" name="address" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>{{ old('address') }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input id="payment_cash" name="payment_method" type="radio" value="cash" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" required>
+                                    <label for="payment_cash" class="ml-3 block text-sm font-medium text-gray-700">
+                                        Cash
+                                    </label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="payment_transfer" name="payment_method" type="radio" value="transfer_bank" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                    <label for="payment_transfer" class="ml-3 block text-sm font-medium text-gray-700">
+                                        Transfer Bank
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <input type="hidden" name="items" id="items-input">
                         <button type="submit" id="submit-order-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
